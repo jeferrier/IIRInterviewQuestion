@@ -1,0 +1,21 @@
+﻿@* Check to make sure the list is actually a list before rendering the list tag*@
+@if (ResourceModels is not null) {
+    <ol>
+    @foreach(ResourceModel? resource in ResourceModels){
+        @* Assuming here that lists might contain null entries. *@
+        @* Also assuming we have a function for detecting whether a resource is "empty" *@
+        @if (resource is not null && resource.isEmpty() == false){
+            < li >
+                @Html.DisplayFor(ResourceModel => resource.Id) < br />
+                @Html.DisplayFor(ResourceModel => resource.TypeName) < br />
+                @Html.DisplayFor(ResourceModel => resource.Title) < br />
+                @Html.DisplayFor(ResourceModel => resource.ShortDescription) < br />
+                @Html.DisplayFor(ResourceModel => resource.LinkUrl) < br />
+                @Html.DisplayFor(ResourceModel => resource.ThumbnailURI) < br />
+                @Html.DisplayFor(ResourceModel => resource.IsActive) < br />
+            </ li >
+        }
+    }
+    </ol>
+}
+...

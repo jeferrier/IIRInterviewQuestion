@@ -1,0 +1,44 @@
+﻿12:00 Did some basic googling on attributes because I wasn't familiar with them.
+12:50 Researched route definitions in regards to the HTTPTrigger to figure out how to change the route name.
+12:55 Looking into making a network request from the function. Ended up here: https://learn.microsoft.com/en-us/aspnet/web-api/overview/advanced/calling-a-web-api-from-a-net-client
+13:00 Other google results seem to echo the same information, but pausing here because of ReadAsAsync<typenamehere> not being clear to me
+      I also recall from the instructions about System.Text.Json, so need to google that quickly
+      Ended up here: https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/how-to
+      All pretty straightforward, moving on to implementation.
+13:04 HTTPClient first.
+      Had to convert the task to async to use getasync
+13:15 Request has the wrong URI, think it has to do with how I specified the base address.
+13:19 Got 200 OK, but response seems to be empty. I suspect I'm choosing the wrong class HttpResponseMessage to interpret the results.
+      However, can't know that until I can actually inspect the contents of the response via HTTPResponseMessage
+      Printed with ReadAsStringAsync, still empty string. Googling a bit.
+13:28 Seems to be related to headers maybe, I'm already accepting "application/json" going to dig a bit more.
+      Perhaps accessing contents incorrectly, still digging.
+      Yeah, that was it. Onto the JSON Deserialization.
+13:44 Also wrote a quick class description for Event Data type
+      Classes are coming back empty. At a loss for the issue, going to start prying at it to find something to google.
+      Field name capitalization maybe? I lowercased (camel case) the names of the class properties.
+      No. Properties are all private, going to try switching them to public.
+      I assumed using {get; set;} would automatically add default getters and setters.
+      I didn't consider that the compiler might be inferring the visibility of the getters and setters from the
+      visibility of the variable.
+13:56 Indeed that fixed it. Stopped to check upper vs lower-case in the property names.
+      That matters as well, wonder if that could be tweaked somehow in the JSONSerializer.Deserialize call. Investigation for another time.
+      On to returning the correct result.
+      Ended up here, neat. https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/ignore-properties
+13:59 I don't really see anything to automatically derive days at JSON serialization. (And actually would prefer not to do it at that time anyways).
+      I need to add a function which computes it automatically.
+      We could do it manually, looping over EventData[] contents.
+      But it seems to be saner to attempt to do it automatically on EventData.(dateStart|dateEnd) set.
+14:18 I added a derived attribute by modifying setter, but the debugger complains when I try to view and the json is empty.
+      Been digging for 15 minutes or so.
+14:33 Forgot to notate. It seems, and I don't understand why actually, that setting ANOTHER field besides the one you're currently supposed to be setting causes problems.
+      So when dateStart is set, I can't set days property on the class. Not a big deal because we ARE permitted to return a different value from the getter.
+      There's another way to do this, modifying the JsonSerializer call, but it's a bit too much for a simple assignment.
+      And no guarantee it would save any computation/memory. But it would 100% guarantee I spend 30 more minutes. So I'm not doing it now.
+      Now to outfit everything with error checking and then spam until we are sure it's working.
+15:00 Error checking done, just doing final output.
+15:07 Lordy, turns out JSONIgnore doesn't filter only outputs, also inputs.
+      So I'll have to do it a different way. I think a simple way would be to just create a different class and initialize it before sending to the output.
+      Much much much easier. And a smidge easier to read.
+      Wish I'd thought of this from the start.
+15:22 Okay, it's done.
